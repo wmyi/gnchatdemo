@@ -1,0 +1,43 @@
+{
+
+    "natsconfig":{
+        "host":"nats://fpp:bar@localhost",
+        "port":4222
+    },
+    "connector":[
+        {
+        "id":"connector001",
+        "host": "127.0.0.1",
+        "clientPort": 12007,
+        "frontend": true,
+        "heartTime":5,
+        "serverType":"connector"
+        }
+    ],
+    "servers":[
+        {
+            "id":"login-001",
+            "serverType":"login",
+            "handleTimeOut":10,
+            "rpcTimeOut":5,
+            "maxRunRoutineNum":10240
+        },
+        {
+            "id":"chat-001",
+            "serverType":"chat",
+            "handleTimeOut":10,
+            "rpcTimeOut":5,
+            "maxRunRoutineNum":10240
+        }
+    ],
+    "master":{
+        "id":"master",
+        "nodeHeartBeart":10
+    },
+    "log":{
+        "encoding": "utf-8",
+        "level":"All",
+        "maxLogSize": 10485760,
+        "numBackups":10
+    }
+}
