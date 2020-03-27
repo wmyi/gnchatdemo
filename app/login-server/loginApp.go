@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	message "gnchatdemo/app/mssage"
+	message "github.com/wmyi/gnchatdemo/app/mssage"
 	"time"
 
 	"github.com/wmyi/gn/config"
