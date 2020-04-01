@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+
 	message "github.com/wmyi/gnchatdemo/app/mssage"
-	"time"
 
 	"github.com/wmyi/gn/config"
 	"github.com/wmyi/gn/gnutil"
@@ -43,7 +43,7 @@ func Login(pack gn.IPack) {
 		UID:      1000,
 		Nickname: "张三",
 	}
-	time.Sleep(15 * time.Second)
+	// time.Sleep(15 * time.Second)
 	pack.ResultJson(respon)
 
 }
@@ -59,6 +59,7 @@ func Logout(pack gn.IPack) {
 
 	serverId, err := gnutil.RPCcalculatorServerId(pack.GetSession().GetCid(),
 		app.GetServerConfig().GetServerByType("chat"))
+	fmt.Printf("loginApp  rpc   serverId     %v \n", serverId)
 	if err == nil {
 		rpcPack, err := app.SendRPCMsg(serverId, "kickGroup", pack.GetData())
 		if err == nil {

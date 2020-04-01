@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/wmyi/gn/config"
 
@@ -49,7 +48,7 @@ func kickGroup(pack gn.IPack) {
 		Code: "ok",
 		Msg:  "kickGroup success ",
 	}
-	time.Sleep(5 * time.Second)
+	// time.Sleep(5 * time.Second)
 	pack.ResultJson(response)
 
 }
