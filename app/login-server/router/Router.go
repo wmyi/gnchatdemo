@@ -19,9 +19,21 @@ func InitAPIRouter(app gn.IApp) {
 	app.APIRouter("login", Login)
 	app.APIRouter("logout", Logout)
 	app.APIRouter("chat", Chat)
+
 }
 func InitRPCRouter(app gn.IApp) {
 	app.RPCRouter("rpcGetAllUsers", rpcGetAllUsers)
+	app.RPCRouter("notifyCreateGroup", notifyCreateGroup)
+}
+
+func notifyCreateGroup(pack gn.IPack) {
+	// notify all player
+	app := pack.GetAPP()
+	if group, ok := app.GetGroup("userSession"); len(pack.GetData()) > 0 && ok && group != nil {
+		group.BroadCast(pack.GetData())
+		// finish
+		pack.SetRPCRespCode(0)
+	}
 }
 
 func rpcGetAllUsers(pack gn.IPack) {
@@ -30,7 +42,7 @@ func rpcGetAllUsers(pack gn.IPack) {
 	users, ok := pack.GetAPP().GetObjectByTag("userList")
 	if ok && users != nil {
 		if mUsers, ok := users.(map[string]*model.UserMode); ok {
-			userList := make([]interface{}, len(mUsers))
+			userList := make([]interface{}, 0, len(mUsers))
 			for _, item := range mUsers {
 				userList = append(userList, item)
 			}
@@ -66,6 +78,12 @@ func Login(pack gn.IPack) {
 		userms = make(map[string]*model.UserMode, 1<<10)
 		app.SetObjectByTag("userList", userms)
 	}
+
+	group, ok := app.GetGroup("userSession")
+	if !ok && group == nil {
+		group = app.NewGroup("userSession")
+	}
+
 	if userMaps, ok := userms.(map[string]*model.UserMode); ok {
 		if _, ok := userMaps[reqData.UID]; !ok {
 			userMaps[reqData.UID] = &model.UserMode{
@@ -74,7 +92,7 @@ func Login(pack gn.IPack) {
 				Status:   1,
 			}
 		}
-		userSlice := make([]*model.UserMode, len(userMaps))
+		userSlice := make([]*model.UserMode, 0, len(userMaps))
 		for _, item := range userMaps {
 			userSlice = append(userSlice, item)
 		}
@@ -91,11 +109,21 @@ func Login(pack gn.IPack) {
 			Users:    userSlice,
 		}
 		//rpc get groups
-		group := GetRemoteGroups(pack)
-		if group != nil {
-			respon.Groups = group
+		groupMode := GetRemoteGroups(pack)
+		if groupMode != nil {
+			pack.GetLogger().Infof(" groupMode     %v", groupMode)
+			respon.Groups = groupMode
 		}
+		// broadCast other all users
+		group.BroadCastJson(respon)
+		// result to request  user
 		pack.ResultJson(respon)
+
+		// 绑定用户Id session
+		pack.GetSession().BindId(reqData.UID)
+		// 保存 在线用户的session 在 group
+		group.AddSession(reqData.UID, pack.GetSession())
+
 	}
 
 }
@@ -105,15 +133,19 @@ func GetRemoteGroups(pack gn.IPack) []*model.GroupMode {
 	serverId, err := gnutil.RPCcalculatorServerId(pack.GetSession().GetCid(),
 		app.GetServerConfig().GetServerByType("chat"))
 	if err == nil {
-		rpcPack, err := app.SendRPCMsg(serverId, "rpcGetAllGroups", pack.GetData())
+		app.GetLogger().Errorf("rpc serverId  %v ", serverId)
+		rpcPack, err := app.SendRPCMsg(serverId, "rpcGetAllGroups", []byte(""))
+		app.GetLogger().Errorf("rpc serverId--  %v ", string(rpcPack.GetData()))
+		app.GetLogger().Errorf("rpc  error code  %v   ", rpcPack.GetRPCRespCode())
 		if rpcPack.GetRPCRespCode() == 0 && err == nil {
-			groups := make([]*model.GroupMode, 10)
-			err := jsonI.Unmarshal(rpcPack.GetData(), groups)
+			var groups []*model.GroupMode
+			err := jsonI.Unmarshal(rpcPack.GetData(), &groups)
 			if err == nil {
 				return groups
 			}
+			app.GetLogger().Errorf("rpc  error groups  %v  error  %v ", groups, err)
 		} else {
-			app.GetLoger().Errorf("rpc  error code  %v  error  %v ", rpcPack.GetRPCRespCode(), err)
+			app.GetLogger().Errorf("rpc  error code  %v  error  %v ", rpcPack.GetRPCRespCode(), err)
 		}
 	}
 	return nil
@@ -122,7 +154,7 @@ func GetRemoteGroups(pack gn.IPack) []*model.GroupMode {
 // 聊天
 func Chat(pack gn.IPack) {
 
-	fmt.Printf("loginApp  Login   pack  data %v \n", string(pack.GetData()))
+	fmt.Printf("loginApp  Chat   pack  data %v \n", string(pack.GetData()))
 
 	//unmarshal json
 	reqData := &message.LoginReq{}
@@ -136,18 +168,29 @@ func Chat(pack gn.IPack) {
 	}
 	// logic
 	// response to connector
-	respon := &message.ChatRes{
-		Code:     "ok",
-		Router:   "chat",
-		Date:     time.Now().Format("2006-01-02 15:04:05"),
-		Msg:      reqData.Msg,
-		Nickname: reqData.Nickname,
-		UID:      reqData.UID,
-		Bridge:   reqData.Bridge,
-		GroupID:  reqData.GroupID,
-		Status:   1,
+	app := pack.GetAPP()
+	if len(reqData.Bridge) > 0 {
+		group, ok := app.GetGroup("userSession")
+		if ok && group != nil {
+			for _, uid := range reqData.Bridge {
+				s, ok := group.GetSession(uid)
+				if ok && s != nil {
+					respon := &message.ChatRes{
+						Router:   "chat",
+						Date:     time.Now().Format("2006-01-02 15:04:05"),
+						Msg:      reqData.Msg,
+						Nickname: reqData.Nickname,
+						UID:      reqData.UID,
+						Bridge:   reqData.Bridge,
+						GroupID:  reqData.GroupID,
+						Status:   1,
+					}
+					// push other user msg
+					app.PushJsonMsg(s, respon)
+				}
+			}
+		}
 	}
-	pack.ResultJson(respon)
 }
 
 func Logout(pack gn.IPack) {
@@ -166,10 +209,10 @@ func Logout(pack gn.IPack) {
 	app := pack.GetAPP()
 	userms, _ := app.GetObjectByTag("userList")
 	if userMaps, ok := userms.(map[string]*model.UserMode); ok {
-		if user, ok := userMaps[reqData.UID]; !ok {
-			user.Status = 0
+		if _, ok := userMaps[reqData.UID]; !ok {
+			delete(userMaps, reqData.UID)
 		}
-		userSlice := make([]*model.UserMode, len(userMaps))
+		userSlice := make([]*model.UserMode, 0, len(userMaps))
 		for _, item := range userMaps {
 			userSlice = append(userSlice, item)
 		}
@@ -186,11 +229,16 @@ func Logout(pack gn.IPack) {
 			Users:    userSlice,
 		}
 		//rpc get groups
-		group := GetRemoteGroups(pack)
-		if group != nil {
-			respon.Groups = group
+		groupMode := GetRemoteGroups(pack)
+		if groupMode != nil {
+
+			respon.Groups = groupMode
 		}
-		pack.ResultJson(respon)
+		group, ok := app.GetGroup("userSession")
+		if group != nil && ok {
+			group.DelSession(reqData.UID)
+			group.BroadCastJson(respon)
+		}
 	}
 
 }

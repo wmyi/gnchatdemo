@@ -46,7 +46,7 @@
         </div>
       </div>
       <div class="right content">
-        <div class="header im-title">{{title}}</div>
+        <div class="header im-title">{{title}} --昵称：{{nickname}} </div>
         <div class="body im-record" id="im-record">
           <div class="ul">
             <div class="li" :class="{user: item.uid == uid}" v-for="item in currentMessage">
@@ -177,7 +177,7 @@ export default {
     addGroup(item){
       this.socket.send(JSON.stringify({
         uid: this.uid,
-        type: 20,
+        router: "chat.addGroup",
         nickname: this.nickname,
         groupId: item.id,
         groupName: item.name,
@@ -198,7 +198,7 @@ export default {
       }
       this.socket.send(JSON.stringify({
         uid: this.uid,
-        type: 10,
+        router: "chat.createGroup",
         nickname: this.nickname,
         groupName: this.groupName,
         bridge: []
@@ -233,12 +233,16 @@ export default {
         this.$message({type: 'error', message: '请选择发送人或者群'})
         return;
       }
-      this.sendMessage(100, this.msg)
+      if (this.bridge.length>0){
+         this.sendMessage("login.chat", this.msg)
+      }else if(this.groupId){
+         this.sendMessage("chat.chatGroup", this.msg)
+      }
     },
-    sendMessage(type, msg){
+    sendMessage(router, msg){
       this.socket.send(JSON.stringify({
         uid: this.uid,
-        type: type,
+        router: router,
         nickname: this.nickname,
         msg: msg,
         bridge: this.bridge,
@@ -249,7 +253,7 @@ export default {
     conWebSocket(){
       let vm = this;
       if(window.WebSocket){
-        vm.socket = new WebSocket('ws://localhost:8001');
+        vm.socket = new WebSocket('ws://localhost:12007/ws');
         let socket = vm.socket;
 
         socket.onopen = function(e){
@@ -257,12 +261,12 @@ export default {
           vm.$message({type: 'success', message: '连接服务器成功'})
           if(!vm.uid){
             vm.uid = 'web_im_' + moment().valueOf();
-            localStorage.setItem('WEB_IM_USER', JSON.stringify({
-              uid: vm.uid,
-              nickname: vm.nickname
-            }))
+            // localStorage.setItem('WEB_IM_USER', JSON.stringify({
+            //   uid: vm.uid,
+            //   nickname: vm.nickname
+            // }))
           }
-          vm.sendMessage(1)
+          vm.sendMessage("login.login")
         }
         socket.onclose = function(e){
           console.log("服务器关闭");

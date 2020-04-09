@@ -25,7 +25,6 @@ type ClientRes struct {
 }
 
 type ChatRes struct {
-	Code     string   `json:"code"`
 	UID      string   `json:"uid"`
 	Router   string   `json:"router"`
 	Nickname string   `json:"nickname"`

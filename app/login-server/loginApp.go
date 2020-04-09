@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/wmyi/gn/config"
-	"github.com/wmyi/gnchatdemo/app/chat-server/router"
+	"github.com/wmyi/gnchatdemo/app/login-server/router"
 
 	"github.com/wmyi/gn/gn"
 )
