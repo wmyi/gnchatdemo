@@ -1,25 +1,0 @@
-[gn] 2020/03/25 10:26:51.679203 natsLinker.go:159: [Info]  natsLinker Run done  urls: [nats://localhost:4222] clientId: 1 Subscribe: connector001  
-[gn] 2020/03/25 10:27:16.521523 natsLinker.go:148: [Info]  nats  receive   msg  masterconnector001(:init   
-
-[gn] 2020/03/25 10:27:16.521938 connector.go:222: [Info]   connector  RearEnd receive msg      masterconnector001(:init 
-[gn] 2020/03/25 10:27:16.522079 appcmd.go:100: [Info]   AppCmd  pb   pack     &{<nil> 0xc0000cfe80 [] 0xc0000e2c80 false <nil>}  
-[gn] 2020/03/25 10:27:16.522259 appcmd.go:81: [Error]  AppCmd  LoopCmdInChan  go   goroutine 25 [running]:
-runtime/debug.Stack(0xc0000da638, 0x149e440, 0x18f1e50)
-	/usr/local/go/src/runtime/debug/stack.go:24 +0x9d
-gn/gn%2eapp.(*AppCmd).LoopCmdInChan.func1(0xc0000ba6c0)
-	/Users/xl-mingyi.wu/WorkspceGo/src/gn/gn.app/appcmd.go:81 +0x54
-panic(0x149e440, 0x18f1e50)
-	/usr/local/go/src/runtime/panic.go:679 +0x1b2
-gn/gn%2eapp.(*AppCmd).PingHandler(0xc0000ba6c0, 0x15d7920, 0xc0000c0af0)
-	/Users/xl-mingyi.wu/WorkspceGo/src/gn/gn.app/appcmd.go:72 +0xb8
-gn/gn%2eapp.(*AppCmd).handlePack(0xc0000ba6c0, 0x15d7920, 0xc0000c0af0)
-	/Users/xl-mingyi.wu/WorkspceGo/src/gn/gn.app/appcmd.go:102 +0x15a
-gn/gn%2eapp.(*AppCmd).LoopCmdInChan(0xc0000ba6c0, 0x15d2400, 0xc0000cfd40)
-	/Users/xl-mingyi.wu/WorkspceGo/src/gn/gn.app/appcmd.go:92 +0x83
-created by gn/gn%2eapp.(*AppCmd).Run
-	/Users/xl-mingyi.wu/WorkspceGo/src/gn/gn.app/appcmd.go:54 +0x144
-
-[gn] 2020/03/25 10:27:36.620203 natsLinker.go:148: [Info]  nats  receive   msg  masterconnector001(:init   
-
-[gn] 2020/03/25 10:27:36.620287 connector.go:222: [Info]   connector  RearEnd receive msg      masterconnector001(:init 
-[gn] 2020/03/25 14:59:22.009143 natsLinker.go:159: [Info]  natsLinker Run done  urls: [nats://localhost:4222] clientId: 1 Subscribe: connector001  
