@@ -159,14 +159,14 @@ export default {
     },
     usersUnRead(){
       return this.messageList.some(item=>{
-        return item.bridge.length && item.status === 1
+        return item.bridge && item.bridge.length && item.status === 1
       })
     },
     currentUserList() {
       let vm = this;
       vm.users.map(user=>{
         user.unread = this.messageList.filter(item=>{
-          return item.bridge.length && item.uid === user.uid && item.status === 1
+          return item.bridge&& item.bridge.length && item.uid === user.uid && item.status === 1
         }).length
         return user;
       })

@@ -19,11 +19,54 @@ func InitAPIRouter(app gn.IApp) {
 	app.APIRouter("login", Login)
 	app.APIRouter("logout", Logout)
 	app.APIRouter("chat", Chat)
+	app.APIRouter("wsclose", WsClosedHandler)
 
 }
 func InitRPCRouter(app gn.IApp) {
 	app.RPCRouter("rpcGetAllUsers", rpcGetAllUsers)
 	app.RPCRouter("notifyCreateGroup", notifyCreateGroup)
+}
+
+func WsClosedHandler(pack gn.IPack) {
+	app := pack.GetAPP()
+	if len(pack.GetBindId()) > 0 {
+		userms, _ := app.GetObjectByTag("userList")
+		if userMaps, ok := userms.(map[string]*model.UserMode); ok {
+			if delUser, ok := userMaps[pack.GetBindId()]; ok && delUser != nil {
+				// user delete
+				delete(userMaps, pack.GetBindId())
+				userSlice := make([]*model.UserMode, 0, len(userMaps))
+				for _, item := range userMaps {
+					userSlice = append(userSlice, item)
+				}
+
+				// response  to connectors
+				respon := &message.ClientRes{
+					Code:     "ok",
+					Router:   "wsclose",
+					Date:     time.Now().Format("2006-01-02 15:04:05"),
+					Msg:      delUser.Nickname + "退出聊天室",
+					Nickname: delUser.Nickname,
+					UID:      delUser.UID,
+					Users:    userSlice,
+					Bridge:   []string{},
+				}
+				//rpc get groups
+				groupMode := GetRemoteGroups(pack)
+				if groupMode != nil {
+					respon.Groups = groupMode
+				}
+				group, ok := app.GetGroup("userSession")
+				if group != nil && ok {
+					group.DelSession(delUser.UID)
+					group.BroadCastJson(respon)
+				}
+
+			}
+
+		}
+	}
+
 }
 
 func notifyCreateGroup(pack gn.IPack) {
@@ -133,10 +176,7 @@ func GetRemoteGroups(pack gn.IPack) []*model.GroupMode {
 	serverId, err := gnutil.RPCcalculatorServerId(pack.GetSession().GetCid(),
 		app.GetServerConfig().GetServerByType("chat"))
 	if err == nil {
-		app.GetLogger().Errorf("rpc serverId  %v ", serverId)
 		rpcPack, err := app.SendRPCMsg(serverId, "rpcGetAllGroups", []byte(""))
-		app.GetLogger().Errorf("rpc serverId--  %v ", string(rpcPack.GetData()))
-		app.GetLogger().Errorf("rpc  error code  %v   ", rpcPack.GetRPCRespCode())
 		if rpcPack.GetRPCRespCode() == 0 && err == nil {
 			var groups []*model.GroupMode
 			err := jsonI.Unmarshal(rpcPack.GetData(), &groups)
