@@ -128,9 +128,7 @@ export default {
     currentMessage() {
       let vm = this;
       let data = vm.messageList.filter(item=>{
-        if(item.type === 1) {
-          return item;
-        } else if(this.groupId) {
+       if(this.groupId) {
           return item.groupId === this.groupId
         } else if(item.bridge.length){
           return item.bridge.sort().join(',') == vm.bridge.sort().join(',')
