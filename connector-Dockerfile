@@ -1,0 +1,22 @@
+FROM golang:latest
+
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64 \
+    GOPROXY=https://goproxy.io,direct \
+    HOME=/root/go/gnchatdemo
+
+MAINTAINER mingyi.wu 15801227644@126.com
+WORKDIR ${HOME}
+ COPY config  ./config/
+ COPY go.mod  .
+ COPY go.sum  .
+ COPY app  ./app/
+RUN  go mod download
+WORKDIR ${HOME}/app/connector/
+RUN   echo $PWD &&  go build -o connector .
+WORKDIR ${HOME}
+VOLUME  /logs/  /logs
+WORKDIR ${HOME}/app/connector/
+ENTRYPOINT ["./connector","-serverId","connector001","-mode",""]
