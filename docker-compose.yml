@@ -1,0 +1,62 @@
+version: '3'
+services: 
+
+    nats:
+        image: nats:latest
+        hostname: nats
+        # entrypoint: "/gnatsd -DV"
+        expose:
+            - "4222"
+        ports:
+          - "4222:4222"
+          - "6222:6222"
+          - "8222:8222"
+    
+    connector:
+        build:
+            context: . 
+            dockerfile: connector-Dockerfile
+        container_name: connector
+        ports: 
+            - "12007:12007"
+        links:
+            - nats
+        environment:
+            - "NATS_URI=nats://nats:4222"
+        depends_on: 
+            - nats
+    
+    login:
+        build: 
+            context: .
+            dockerfile: login-Dockerfile
+        container_name: login
+        links:
+            - nats
+        environment:
+            - "NATS_URI=nats://nats:4222"
+        depends_on: 
+            - nats
+    
+    chat:
+        build: 
+            context: .
+            dockerfile: chat-Dockerfile
+        container_name: chat
+        links:
+            - nats
+        environment:
+            - "NATS_URI=nats://nats:4222"
+        depends_on: 
+            - nats
+    
+    nginx:
+        build: 
+            context: .
+            dockerfile: nginx-Dockerfile
+        ports: 
+            - "8080:80"
+        container_name: gnchat-nginx
+        depends_on: 
+            - connector
+    
