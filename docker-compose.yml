@@ -4,7 +4,7 @@ services:
     nats:
         image: nats:latest
         hostname: nats
-        entrypoint: "/gnatsd -DV"
+        # entrypoint: "/gnatsd -DV"
         expose:
             - "4222"
         ports:
