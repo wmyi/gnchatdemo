@@ -4,6 +4,9 @@ services:
     nats:
         image: nats:latest
         hostname: nats
+        entrypoint: "/gnatsd -DV"
+        expose:
+            - "4222"
         ports:
           - "4222:4222"
           - "6222:6222"
@@ -16,6 +19,10 @@ services:
         container_name: connector
         ports: 
             - "12007:12007"
+        links:
+            - nats
+        environment:
+            - "NATS_URI=nats://nats:4222"
         depends_on: 
             - nats
     
@@ -24,6 +31,10 @@ services:
             context: .
             dockerfile: login-Dockerfile
         container_name: login
+        links:
+            - nats
+        environment:
+            - "NATS_URI=nats://nats:4222"
         depends_on: 
             - nats
     
@@ -32,6 +43,10 @@ services:
             context: .
             dockerfile: chat-Dockerfile
         container_name: chat
+        links:
+            - nats
+        environment:
+            - "NATS_URI=nats://nats:4222"
         depends_on: 
             - nats
     
