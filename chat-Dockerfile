@@ -19,4 +19,4 @@ RUN   echo $PWD &&  go build -o chatApp .
 WORKDIR ${HOME}
 VOLUME  /logs/  /logs
 WORKDIR ${HOME}/app/chat-server/
-ENTRYPOINT ["./chatApp","-serverId","chat001","-mode",""]
+ENTRYPOINT ["./chatApp","-serverId","chat-001","-mode",""]
