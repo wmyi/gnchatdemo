@@ -16,7 +16,5 @@ WORKDIR ${HOME}
 RUN  go mod download
 WORKDIR ${HOME}/app/chat-server/
 RUN   echo $PWD &&  go build -o chatApp .
-WORKDIR ${HOME}
-VOLUME  /logs/  /logs
 WORKDIR ${HOME}/app/chat-server/
 ENTRYPOINT ["./chatApp","-serverId","chat-001","-mode",""]

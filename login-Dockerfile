@@ -16,7 +16,5 @@ WORKDIR ${HOME}
 RUN  go mod download
 WORKDIR ${HOME}/app/login-server/
 RUN   echo $PWD &&  go build -o login .
-WORKDIR ${HOME}
-VOLUME  /logs/  /logs
 WORKDIR ${HOME}/app/login-server/
 ENTRYPOINT ["./login","-serverId","login-001","-mode",""]

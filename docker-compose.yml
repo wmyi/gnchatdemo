@@ -4,7 +4,6 @@ services:
     nats:
         image: nats:latest
         hostname: nats
-        # entrypoint: "/gnatsd -DV"
         expose:
             - "4222"
         ports:
@@ -17,6 +16,9 @@ services:
             context: . 
             dockerfile: connector-Dockerfile
         container_name: connector
+        hostname: connector
+        expose:
+            - "12007"
         ports: 
             - "12007:12007"
         links:
@@ -51,11 +53,14 @@ services:
             - nats
     
     nginx:
-        build: 
-            context: .
-            dockerfile: nginx-Dockerfile
+        image: nginx:latest
         ports: 
             - "8080:80"
+        volumes: 
+            - ./app/web/dist:/usr/share/nginx/html/
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        links: 
+            - nats
         container_name: gnchat-nginx
         depends_on: 
             - connector

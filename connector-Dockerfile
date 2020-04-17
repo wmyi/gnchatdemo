@@ -16,7 +16,5 @@ WORKDIR ${HOME}
 RUN  go mod download
 WORKDIR ${HOME}/app/connector/
 RUN   echo $PWD &&  go build -o connector .
-WORKDIR ${HOME}
-VOLUME  /logs/  /logs
 WORKDIR ${HOME}/app/connector/
 ENTRYPOINT ["./connector","-serverId","connector001","-mode",""]
