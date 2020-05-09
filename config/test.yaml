@@ -1,0 +1,43 @@
+register:
+  - case_id: 1
+    title: 注册用例1
+    method: POST
+    url: /register
+    data:
+      account: '123456789'
+      pwd: '12345678'
+    expect:
+      code: 0
+      msg: OK
+  - case_id: 2
+    title: 注册用例2
+    method: POST
+    url: /register
+    data:
+      account: '123456788'
+      pwd: '12345678'
+      type: 1
+    expect:
+      code: 0
+      msg: OK
+login:
+  - case_id: 1
+    title: 登陆用例1
+    method: POST
+    url: /login
+    data:
+      account: '123456789'
+      pwd: '12345678'
+    expect:
+      code: 0
+      msg: OK
+  - case_id: 2
+    title: 登陆用例2
+    method: POST
+    url: /login
+    data:
+      account: '123456788'
+      pwd: '12345678'
+    expect:
+      code: 0
+      msg: OK
