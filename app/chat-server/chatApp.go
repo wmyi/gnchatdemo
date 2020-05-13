@@ -21,6 +21,7 @@ func main() {
 		fmt.Printf("new APP error %v \n", err)
 		return
 	}
+
 	router.InitAPIRouter(app)
 	router.InitRPCRouter(app)
 	err = app.Run()

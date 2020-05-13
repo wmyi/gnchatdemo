@@ -102,7 +102,8 @@ func rpcGetAllUsers(pack gn.IPack) {
 }
 
 func Login(pack gn.IPack) {
-	fmt.Printf("loginApp  Login   pack  data %v \n", string(pack.GetData()))
+
+	pack.GetLogger().Infof("loginApp  Login   pack  data %v \n", string(pack.GetData()))
 
 	//unmarshal json
 	reqData := &message.LoginReq{}
@@ -167,6 +168,19 @@ func Login(pack gn.IPack) {
 		// 保存 在线用户的session 在 group
 		group.AddSession(reqData.UID, pack.GetSession())
 
+	}
+
+	// test  yaml  config
+
+	testConfig := app.GetConfigViper("test")
+	if testConfig != nil {
+		loginMap := testConfig.Get("login").([]interface{})
+		for _, value := range loginMap {
+			keys := value.(map[interface{}]interface{})
+			for idx, key := range keys {
+				pack.GetLogger().Infof("key  %v   value  %v \n", idx, key)
+			}
+		}
 	}
 
 }
