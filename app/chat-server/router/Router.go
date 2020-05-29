@@ -17,13 +17,13 @@ var (
 )
 
 func InitAPIRouter(app gn.IApp) {
-	app.APIRouter("addGroup", addGroup)
-	app.APIRouter("createGroup", createGroup)
-	app.APIRouter("chatGroup", chatGroup)
+	app.APIRouter("addGroup", true, addGroup)
+	app.APIRouter("createGroup", true, createGroup)
+	app.APIRouter("chatGroup", false, chatGroup)
 }
 
 func InitRPCRouter(app gn.IApp) {
-	app.RPCRouter("rpcGetAllGroups", rpcGetAllGroups)
+	app.RPCRouter("rpcGetAllGroups", false, rpcGetAllGroups)
 }
 
 func rpcGetAllGroups(pack gn.IPack) {
@@ -42,6 +42,7 @@ func rpcGetAllGroups(pack gn.IPack) {
 		}
 		return
 	}
+
 	pack.SetRPCRespCode(101)
 }
 
@@ -50,7 +51,7 @@ func GetRemoteUsers(pack gn.IPack) []*model.UserMode {
 	serverId, err := gnutil.RPCcalculatorServerId(pack.GetSession().GetCid(),
 		app.GetServerConfig().GetServerByType("login"))
 	if err == nil {
-		rpcPack, err := app.SendRPCMsg(serverId, "rpcGetAllUsers", pack.GetData())
+		rpcPack, err := app.RequestRPCMsg(serverId, "rpcGetAllUsers", pack.GetData())
 		if rpcPack.GetRPCRespCode() == 0 && err == nil {
 			var users []*model.UserMode
 			err := jsonI.Unmarshal(rpcPack.GetData(), &users)
@@ -211,9 +212,9 @@ func createGroup(pack gn.IPack) {
 		serverId, err := gnutil.RPCcalculatorServerId(pack.GetSession().GetCid(),
 			app.GetServerConfig().GetServerByType("login"))
 		if err == nil {
-			rpcPack, err := app.SendRPCJsonMsg(serverId, "notifyCreateGroup", respon)
-			if rpcPack == nil || rpcPack.GetRPCRespCode() != 0 || err != nil {
-				app.GetLogger().Errorf("rpc  notifyCreateGroup error code  %v  error  %v ", rpcPack.GetRPCRespCode(), err)
+			err := app.NotifyRPCJsonMsg(serverId, "notifyCreateGroup", respon)
+			if err != nil {
+				app.GetLogger().Errorf("rpc  NotifyRPCJsonMsg error %v ", err)
 			}
 		}
 
