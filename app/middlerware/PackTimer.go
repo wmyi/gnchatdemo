@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 
+	logger "github.com/wmyi/gn/glog"
 	"github.com/wmyi/gn/gn"
 )
 
@@ -15,11 +16,11 @@ func (t *PackTimer) Before(pack gn.IPack) {
 	nowTime := time.Now()
 	pack.SetContextValue("reqId", reqId)
 	pack.SetContextValue("inTime", nowTime)
-	pack.GetLogger().Infof("Before reqId: %d    time %v  ", reqId, nowTime)
+	logger.Infof("Before reqId: %d    time %v  ", reqId, nowTime)
 }
 
 func (t *PackTimer) After(pack gn.IPack) {
 	reqId := pack.GetContextValue("reqId").(int)
 	nowTime := pack.GetContextValue("inTime").(time.Time)
-	pack.GetLogger().Infof("After reqId: %d   diff time %v  ", reqId, time.Now().Sub(nowTime))
+	logger.Infof("After reqId: %d   diff time %v  ", reqId, time.Now().Sub(nowTime))
 }

@@ -1,11 +1,11 @@
 package router
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
+	logger "github.com/wmyi/gn/glog"
 	"github.com/wmyi/gn/gn"
 	"github.com/wmyi/gn/gnutil"
 	"github.com/wmyi/gnchatdemo/app/message"
@@ -59,14 +59,14 @@ func GetRemoteUsers(pack gn.IPack) []*model.UserMode {
 				return users
 			}
 		} else {
-			app.GetLogger().Errorf("rpc  error code  %v  error  %v ", rpcPack.GetRPCRespCode(), err)
+			logger.Errorf("rpc  error code  %v  error  %v ", rpcPack.GetRPCRespCode(), err)
 		}
 	}
 	return nil
 }
 
 func addGroup(pack gn.IPack) {
-	fmt.Printf("chatApp  addGroup   pack  data %v \n", string(pack.GetData()))
+	logger.Infof("chatApp  addGroup   pack  data %v \n", string(pack.GetData()))
 	//unmarshal json
 	reqData := &message.LoginReq{}
 	// request  data
@@ -122,7 +122,7 @@ func addGroup(pack gn.IPack) {
 }
 
 func chatGroup(pack gn.IPack) {
-	fmt.Printf("chatApp  chatGroup   pack  data %v \n", string(pack.GetData()))
+	logger.Infof("chatApp  chatGroup   pack  data %v \n", string(pack.GetData()))
 	//unmarshal json
 	reqData := &message.LoginReq{}
 	// request  data
@@ -155,7 +155,7 @@ func chatGroup(pack gn.IPack) {
 }
 
 func createGroup(pack gn.IPack) {
-	fmt.Printf("chatApp  addGroup   pack  data %v \n", string(pack.GetData()))
+	logger.Infof("chatApp  addGroup   pack  data %v \n", string(pack.GetData()))
 	//unmarshal json
 	reqData := &message.LoginReq{}
 	// request  data
@@ -214,7 +214,7 @@ func createGroup(pack gn.IPack) {
 		if err == nil {
 			err := app.NotifyRPCJsonMsg(serverId, "notifyCreateGroup", respon)
 			if err != nil {
-				app.GetLogger().Errorf("rpc  NotifyRPCJsonMsg error %v ", err)
+				logger.Errorf("rpc  NotifyRPCJsonMsg error %v ", err)
 			}
 		}
 

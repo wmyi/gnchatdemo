@@ -1,10 +1,10 @@
 package router
 
 import (
-	"fmt"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
+	logger "github.com/wmyi/gn/glog"
 	"github.com/wmyi/gn/gn"
 	"github.com/wmyi/gn/gnutil"
 	"github.com/wmyi/gnchatdemo/app/message"
@@ -101,7 +101,7 @@ func rpcGetAllUsers(pack gn.IPack) {
 
 func Login(pack gn.IPack) {
 
-	pack.GetLogger().Infof("loginApp  Login   pack  data %v \n", string(pack.GetData()))
+	logger.Infof("loginApp  Login   pack  data %v \n", string(pack.GetData()))
 
 	//unmarshal json
 	reqData := &message.LoginReq{}
@@ -153,7 +153,7 @@ func Login(pack gn.IPack) {
 		//rpc get groups
 		groupMode := GetRemoteGroups(pack)
 		if groupMode != nil {
-			pack.GetLogger().Infof(" groupMode     %v", groupMode)
+			logger.Infof(" groupMode     %v", groupMode)
 			respon.Groups = groupMode
 		}
 		// broadCast other all users
@@ -176,7 +176,7 @@ func Login(pack gn.IPack) {
 		for _, value := range loginMap {
 			keys := value.(map[interface{}]interface{})
 			for idx, key := range keys {
-				pack.GetLogger().Infof("key  %v   value  %v \n", idx, key)
+				logger.Infof("key  %v   value  %v \n", idx, key)
 			}
 		}
 	}
@@ -195,9 +195,9 @@ func GetRemoteGroups(pack gn.IPack) []*model.GroupMode {
 			if err == nil {
 				return groups
 			}
-			app.GetLogger().Errorf("rpc  error groups  %v  error  %v ", groups, err)
+			logger.Errorf("rpc  error groups  %v  error  %v ", groups, err)
 		} else {
-			app.GetLogger().Errorf("rpc  error code  %v  error  %v ", rpcPack.GetRPCRespCode(), err)
+			logger.Errorf("rpc  error code  %v  error  %v ", rpcPack.GetRPCRespCode(), err)
 		}
 	}
 	return nil
@@ -206,7 +206,7 @@ func GetRemoteGroups(pack gn.IPack) []*model.GroupMode {
 // 聊天
 func Chat(pack gn.IPack) {
 
-	fmt.Printf("loginApp  Chat   pack  data %v \n", string(pack.GetData()))
+	logger.Infof("loginApp  Chat   pack  data %v \n", string(pack.GetData()))
 
 	//unmarshal json
 	reqData := &message.LoginReq{}
@@ -246,7 +246,7 @@ func Chat(pack gn.IPack) {
 }
 
 func Logout(pack gn.IPack) {
-	fmt.Printf("loginApp  logout   pack  data %v \n", string(pack.GetData()))
+	logger.Infof("loginApp  logout   pack  data %v \n", string(pack.GetData()))
 	//unmarshal json
 	reqData := &message.LoginReq{}
 	// request  data

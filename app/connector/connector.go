@@ -1,24 +1,24 @@
 package main
 
 import (
-	"fmt"
 	"hash/crc32"
 
 	"github.com/wmyi/gn/config"
 	"github.com/wmyi/gn/connector"
+	logger "github.com/wmyi/gn/glog"
 	"github.com/wmyi/gn/gnError"
 )
 
 func main() {
 	config, err := config.NewConfig("../../config/development.json")
 	if err != nil {
-		fmt.Println("config  error ", err)
+		logger.Infof("config  error ", err)
 		return
 	}
-	// fmt.Printf("config:      %v  \n  ", config)
+	// logger.Infof("config:      %v  \n  ", config)
 	connector, err := connector.DefaultConnector(config)
 	if err != nil {
-		fmt.Println("new DefaultConnect  error ", err)
+		logger.Infof("new DefaultConnect  error ", err)
 		return
 	}
 	// exception handler
@@ -36,10 +36,10 @@ func main() {
 	connector.AddRouterRearEndHandler("connector", connectorRoure)
 	err = connector.Run()
 	if err != nil {
-		fmt.Printf("connector run   error   %v \n", err)
+		logger.Infof("connector run   error   %v \n", err)
 		return
 	}
-
+	defer connector.Done()
 }
 
 func connectorRoure(cid string, bindId string, serverList []*config.ServersConfig) string {

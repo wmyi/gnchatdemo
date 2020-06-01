@@ -1,25 +1,23 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/wmyi/gn/config"
+	logger "github.com/wmyi/gn/glog"
+	"github.com/wmyi/gn/gn"
 	"github.com/wmyi/gnchatdemo/app/login-server/router"
 	"github.com/wmyi/gnchatdemo/app/middlerware"
-
-	"github.com/wmyi/gn/gn"
 )
 
 func main() {
 
 	config, err := config.NewConfig("../../config/development.json")
 	if err != nil {
-		fmt.Println("config  error\n ", err)
+		logger.Infof("config  error\n ", err)
 		return
 	}
 	app, err := gn.DefaultApp(config)
 	if err != nil {
-		fmt.Printf("new APP error %v \n", err)
+		logger.Infof("new APP error %v \n", err)
 		return
 	}
 	router.InitAPIRouter(app)
@@ -29,8 +27,8 @@ func main() {
 	app.UseMiddleWare(&middlerware.PackTimer{})
 	err = app.Run()
 	if err != nil {
-		fmt.Printf("loginApp run   error   %v \n", err)
+		logger.Infof("loginApp run   error   %v \n", err)
 		return
 	}
-
+	defer app.Done()
 }
