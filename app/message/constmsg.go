@@ -24,6 +24,16 @@ type ClientRes struct {
 	Bridge   []string           `json:"bridge"`
 }
 
+type CmdOnlineReq struct {
+	Admin string `json:"admin"`
+	Msg   string `json:"msg"`
+}
+
+type CmdOnlineRes struct {
+	ServerId string `json:"serverId"`
+	Msg      string `json:"msg"`
+}
+
 type ChatRes struct {
 	UID      string   `json:"uid"`
 	Router   string   `json:"router"`
