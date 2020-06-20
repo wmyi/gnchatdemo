@@ -3,9 +3,15 @@ package main
 import (
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/wmyi/gn/config"
 	logger "github.com/wmyi/gn/glog"
 	imaster "github.com/wmyi/gn/master"
+	"github.com/wmyi/gnchatdemo/app/message"
+)
+
+var (
+	jsonI = jsoniter.ConfigCompatibleWithStandardLibrary
 )
 
 func main() {
@@ -29,6 +35,27 @@ func main() {
 		}
 
 	})
+	// routine  master  不要阻塞主协程
+	go func() {
+		for {
+			time.Sleep(3 * time.Second)
+			req := message.CmdOnlineReq{
+				Admin: "test",
+				Msg:   "test test test",
+			}
+			results, err := master.SendCMDJson("online", "login-001", req)
+			if err != nil {
+				logger.Infof("master.SendCMD online error  %v   \n ", err)
+				return
+			}
+			if len(results) > 0 {
+				res := &message.CmdOnlineRes{}
+				jsonI.Unmarshal(results, res)
+				logger.Infof("master.SendCMD -- online  results  %v ", res)
+			}
+
+		}
+	}()
 
 	go func() {
 		for {
