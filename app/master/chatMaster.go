@@ -35,7 +35,7 @@ func main() {
 		}
 
 	})
-	// get master
+	// routine  master  不要阻塞主协程
 	go func() {
 		for {
 			time.Sleep(3 * time.Second)
