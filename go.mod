@@ -9,4 +9,4 @@ require (
 	golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1 // indirect; indirectx
 )
 
-// replace github.com/wmyi/gn v0.1.4 => ../gn
+replace github.com/wmyi/gn v0.1.4 => ../gn

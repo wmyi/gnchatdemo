@@ -45,5 +45,5 @@
         "maxLogSize": 10485760,
         "numBackups":10
     },
-    "rpctype":"rpcx"
+    "rpctype":"rpc"
 }
